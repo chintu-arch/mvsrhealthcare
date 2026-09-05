@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MVSR Healthcare Facility | Patient Traceability & Smart Clinical Portal</title>
+  <meta name="description" content="MVSR Healthcare Facility advanced medical record traceability, patient revisit tracking, first-time registration, and cashless digital fee payment portal.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230ea5e9' stroke-width='2.2'><path d='M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z'/><path d='M12 5v14'/><path d='M5 12h14'/></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+  <!-- Interactive Canvas for Particle/Confetti Effects -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Quick Emergency Ticker Bar -->
+  <div class="emergency-ticker">
+    <div class="ticker-content">
+      <span class="ticker-badge"><span class="pulse-dot"></span> 24/7 CRITICAL CARE ACTIVE</span>
+      <span class="ticker-text">MVSR Central Medical Center • Emergency Hotline: <strong>+91 40-2456-7890</strong> • Code Red Trauma Team on Duty • Smart Cashless Counter Operational</span>
+    </div>
+    <div class="facility-status">
+      <span class="badge-status online"><span class="status-indicator"></span> E-Health System Online</span>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="main-header">
+    <div class="header-inner container">
+      <div class="brand-group" onclick="app.navigate('home')">
+        <div class="brand-logo-wrapper">
+          <div class="logo-symbol">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+              <path d="M12 5v14"/>
+              <path d="M5 12h14"/>
+            </svg>
+          </div>
+          <div class="logo-glow"></div>
+        </div>
+        <div class="brand-meta">
+          <span class="facility-name">MVSR <span>HEALTHCARE</span></span>
+          <span class="facility-tagline">Excellence in Clinical Care & Patient Traceability</span>
+        </div>
+      </div>
+
+      <!-- Quick Global Patient Search -->
+      <div class="header-search">
+        <form class="search-box" id="global-search-form" onsubmit="event.preventDefault(); app.submitGlobalSearch();">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" id="global-search-input" placeholder="Search patient name or applicant no (e.g. Rajesh, 0001)..." autocomplete="off">
+          <button type="button" id="global-search-clear" class="search-clear-btn hidden" onclick="app.clearGlobalSearch()" title="Clear search">✕</button>
+          <button type="submit" class="search-submit-btn" id="global-search-btn" title="Search Patient">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <span>Search</span>
+          </button>
+          <kbd class="search-kbd" title="Keyboard Shortcut">Ctrl+K</kbd>
+        </form>
+        <div id="quick-search-results" class="quick-search-dropdown hidden"></div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-links">
+        <button class="nav-btn active" data-view="home" onclick="app.navigate('home')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Home</span>
+        </button>
+        <button class="nav-btn" data-view="directory" onclick="app.navigate('directory')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Patient Index</span>
+          <span class="nav-badge" id="nav-patient-count">0</span>
+        </button>
+        <button class="nav-btn" data-view="register" onclick="app.navigate('register')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          <span>New Profile</span>
+          <span class="nav-highlight-pill">1st Visit</span>
+        </button>
+        <button class="nav-btn" data-view="payments" onclick="app.navigate('payments')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+          <span>Cashless Fee Portal</span>
+          <span class="nav-dues-dot" id="nav-dues-alert" title="Pending Dues Available"></span>
+        </button>
+      </nav>
+
+      <!-- User Role / Theme Toggle -->
+      <div class="header-actions">
+        <button class="btn btn-secondary btn-sm" onclick="app.openSupportModal()" title="24/7 MVSR Support Details">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Support Details</span>
+        </button>
+        <button class="theme-toggle-btn" id="theme-toggle" title="Toggle Visual Mode" onclick="app.toggleTheme()">
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          <svg class="icon-sun hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        </button>
+
+        <!-- Interactive Attending Faculty Component -->
+        <div class="faculty-wrapper">
+          <div class="faculty-pill" id="faculty-pill-btn" onclick="app.toggleFacultyMenu()" title="Click to view Faculty Profile or Sign Out">
+            <div class="faculty-avatar" id="header-faculty-avatar">VP</div>
+            <div class="faculty-info">
+              <span class="faculty-role">Attending Faculty</span>
+              <span class="faculty-status-text" id="header-faculty-name">Dr. V. Prasad (MD)</span>
+            </div>
+            <svg style="width: 14px; height: 14px; margin-left: 4px; color: var(--text-dim);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+
+          <!-- Faculty Profile Dropdown Popover with Sign Out -->
+          <div id="faculty-menu-popover" class="faculty-popover hidden">
+            <div class="faculty-popover-header">
+              <div class="faculty-avatar-large" id="popover-faculty-avatar">VP</div>
+              <div>
+                <div class="popover-faculty-name" id="popover-faculty-name">Dr. V. Prasad (MD)</div>
+                <div class="popover-faculty-role" id="popover-faculty-dept">General Medicine • Active On-Duty</div>
+                <div class="popover-faculty-id" id="popover-faculty-id">ID: MVSR-FAC-01</div>
+              </div>
+            </div>
+            <div class="faculty-popover-body">
+              <div class="popover-stat-row">
+                <span>Access Status:</span>
+                <span class="badge-status online" style="padding: 2px 8px;"><span class="status-indicator"></span> Verified Faculty</span>
+              </div>
+              <div class="popover-stat-row mt-2">
+                <span>Faculty Email:</span>
+                <strong id="popover-faculty-email" style="font-size: 11px;">dr.prasad@mvsrhealth.org</strong>
+              </div>
+            </div>
+            <div class="faculty-popover-footer">
+              <button class="btn btn-secondary btn-sm btn-block" onclick="app.handleFacultySignOut()" style="color: #fda4af; border-color: rgba(244, 63, 94, 0.35);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Sign Out Faculty</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Button when logged out -->
+          <button id="header-login-btn" class="btn btn-cyan btn-sm hidden" onclick="app.navigate('auth')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span>Faculty Sign In</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APPLICATION CONTENT CONTAINER -->
+  <main id="app-viewport">
+
+    <!-- ======================================================== -->
+    <!-- VIEW 0: FACULTY LOGIN & SIGN UP PORTAL                   -->
+    <!-- ======================================================== -->
+    <section id="view-auth" class="app-view">
+      <div class="auth-container">
+        <div class="glass-card" style="padding: 36px 30px; position: relative; border-color: rgba(14, 165, 233, 0.35);">
+          <div class="card-glow-edge"></div>
+
+          <div class="auth-header-card">
+            <div class="brand-logo-wrapper" style="margin: 0 auto 16px; width: 52px; height: 52px;">
+              <div class="logo-symbol">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                  <path d="M12 5v14"/>
+                  <path d="M5 12h14"/>
+                </svg>
+              </div>
+              <div class="logo-glow"></div>
+            </div>
+
+            <span class="sub-badge">MVSR HEALTHCARE FACILITY</span>
+            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 6px;">Clinical Faculty Portal</h2>
+            <p style="font-size: 13px; color: var(--text-muted); max-width: 440px; margin: 0 auto;">
+              Sign in to review patient records, document clinical revisits, and access cashless settlements, or register a new healthcare faculty profile.
+            </p>
+          </div>
+
+          <!-- Auth Switcher Tabs -->
+          <div class="auth-tabs-bar">
+            <button class="auth-tab-btn active" id="tab-auth-login" onclick="app.switchAuthTab('login')">
+              <span>🔑 Faculty Sign In</span>
+            </button>
+            <button class="auth-tab-btn" id="tab-auth-signup" onclick="app.switchAuthTab('signup')">
+              <span>➕ Register New Faculty</span>
+            </button>
+          </div>
+
+          <!-- TAB 1: FACULTY LOGIN -->
+          <div id="panel-auth-login" class="auth-panel active">
+            <form id="faculty-login-form" onsubmit="app.handleFacultyLogin(event)">
+              <div class="form-field mb-3" style="margin-bottom: 14px;">
+                <label for="login-faculty-email">Faculty Official Email or ID</label>
+                <input type="text" id="login-faculty-email" placeholder="e.g. dr.prasad@mvsrhealth.org or MVSR-FAC-01" value="dr.prasad@mvsrhealth.org" required>
+              </div>
+
+              <div class="form-field" style="margin-bottom: 18px;">
+                <label for="login-faculty-password">Security Password</label>
+                <input type="password" id="login-faculty-password" placeholder="••••••••" value="password123" required>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block btn-glow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                <span>Enter Healthcare Facility</span>
+              </button>
+            </form>
+
+            <!-- Quick Demo One-Click Doctor Selector -->
+            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+              <span class="chip-label" style="display: block; margin-bottom: 10px; font-weight: 600;">⚡ Quick 1-Click Faculty Demo Login:</span>
+              <div class="quick-doctors-grid">
+                <button type="button" class="quick-doctor-btn" onclick="app.quickFacultyLogin('MVSR-FAC-01')">
+                  <div class="qd-avatar">VP</div>
+                  <div>
+                    <div class="qd-name">Dr. V. Prasad</div>
+                    <div class="qd-dept">General Medicine</div>
+                  </div>
+                </button>
+
+                <button type="button" class="quick-doctor-btn" onclick="app.quickFacultyLogin('MVSR-FAC-02')">
+                  <div class="qd-avatar">RS</div>
+                  <div>
+                    <div class="qd-name">Dr. Radhika Sen</div>
+                    <div class="qd-dept">Cardiology</div>
+                  </div>
+                </button>
+
+                <button type="button" class="quick-doctor-btn" onclick="app.quickFacultyLogin('MVSR-FAC-03')">
+                  <div class="qd-avatar">KR</div>
+                  <div>
+                    <div class="qd-name">Dr. K. Raghavan</div>
+                    <div class="qd-dept">Orthopedics</div>
+                  </div>
+                </button>
+
+                <button type="button" class="quick-doctor-btn" onclick="app.quickFacultyLogin('MVSR-FAC-04')">
+                  <div class="qd-avatar">SM</div>
+                  <div>
+                    <div class="qd-name">Dr. Sunita Murthy</div>
+                    <div class="qd-dept">Pediatrics</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: REGISTER NEW FACULTY (SIGN UP) -->
+          <div id="panel-auth-signup" class="auth-panel">
+            <form id="faculty-signup-form" onsubmit="app.handleFacultySignup(event)">
+              <div class="form-grid">
+                <div class="form-field col-span-2">
+                  <label for="signup-name">Doctor Full Name with Title <span class="required">*</span></label>
+                  <input type="text" id="signup-name" placeholder="e.g. Dr. Arvind Deshmukh" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="signup-degree">Medical Degrees / Qualifications <span class="required">*</span></label>
+                  <input type="text" id="signup-degree" placeholder="e.g. MD, DM Neurology" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="signup-dept">Clinical Department <span class="required">*</span></label>
+                  <select id="signup-dept" class="custom-select" required>
+                    <option value="General Medicine">General Medicine</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Neurology">Neurology</option>
+                    <option value="Orthopedics">Orthopedics</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                    <option value="Dermatology">Dermatology</option>
+                    <option value="Emergency Trauma">Emergency Trauma</option>
+                  </select>
+                </div>
+
+                <div class="form-field col-span-2">
+                  <label for="signup-email">Official Faculty Email <span class="required">*</span></label>
+                  <input type="email" id="signup-email" placeholder="e.g. dr.deshmukh@mvsrhealth.org" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="signup-phone">Contact Phone <span class="required">*</span></label>
+                  <input type="tel" id="signup-phone" placeholder="e.g. +91 98490 88776" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="signup-password">Portal Access Password <span class="required">*</span></label>
+                  <input type="password" id="signup-password" placeholder="Create password" required>
+                </div>
+              </div>
+
+              <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-sm); padding: 10px 14px; margin: 16px 0; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 16px;">🛡️</span>
+                <span>An official <strong>MVSR Faculty ID</strong> will be allocated automatically upon registration.</span>
+              </div>
+
+              <button type="submit" class="btn btn-emerald btn-block btn-glow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                <span>Register Faculty & Enter Portal</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 1: DYNAMIC EYE-CATCHING HOMEPAGE                    -->
+    <!-- ======================================================== -->
+    <section id="view-home" class="app-view active">
+      <!-- Hero Section with Dynamic ECG Monitor -->
+      <div class="hero-section">
+        <div class="hero-glow-circle circle-1"></div>
+        <div class="hero-glow-circle circle-2"></div>
+        
+        <div class="container hero-container">
+          <div class="hero-content">
+            <div class="hero-pill-badge">
+              <span class="pill-sparkle">✨</span>
+              <span>Next-Gen Medical Data Architecture</span>
+              <span class="pill-code">v2.6 Enterprise</span>
+            </div>
+
+            <h1 class="hero-title">
+              Traceable Medical Care, <br>
+              <span class="gradient-text">Zero-Hassle Revisits.</span>
+            </h1>
+
+            <p class="hero-description">
+              Welcome to <strong>MVSR Healthcare Facility</strong>. Designed to empower healthcare faculty with instant patient medical review, chronological revisit histories, automated unique patient indexing, and 100% cashless digital fee settlements without cash counter overhead.
+            </p>
+
+            <div class="hero-actions">
+              <button class="btn btn-primary btn-glow" onclick="app.navigate('register')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                <span>Register First-Time Patient</span>
+              </button>
+              
+              <button class="btn btn-secondary" onclick="app.navigate('directory')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h10"/></svg>
+                <span>Browse Patient Index</span>
+              </button>
+              
+              <button class="btn btn-outline" onclick="app.navigate('payments')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                <span>Cashless Payments</span>
+              </button>
+            </div>
+
+            <!-- Live Cardiac ECG Waveform Monitor Visualizer -->
+            <div class="ecg-monitor-card">
+              <div class="ecg-header">
+                <div class="ecg-status-title">
+                  <span class="heart-pulse-icon">❤️</span>
+                  <span>LIVE CLINICAL TELEMETRY MONITOR</span>
+                </div>
+                <div class="ecg-stats">
+                  <span class="ecg-stat-tag">BPM <strong id="live-bpm">74</strong></span>
+                  <span class="ecg-stat-tag">SpO2 <strong id="live-spo2">99%</strong></span>
+                  <span class="ecg-stat-tag">Rhythm <strong>SINUS NORMAL</strong></span>
+                </div>
+              </div>
+              <div class="ecg-canvas-wrapper">
+                <canvas id="ecg-canvas" height="65"></canvas>
+                <div class="ecg-grid-overlay"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Right: Interactive Quick Access Console -->
+          <div class="hero-sidebar">
+            <!-- Faculty Live Quick Lookup Card -->
+            <div class="glass-card lookup-card">
+              <div class="card-glow-edge"></div>
+              <div class="card-header-compact">
+                <div class="badge-icon-cyan">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+                <div>
+                  <h3 class="card-title">Patient Revisit Lookup</h3>
+                  <p class="card-sub">Instant retrieval for returning patients</p>
+                </div>
+              </div>
+
+              <div class="lookup-form">
+                <label for="home-quick-id">Search Patient Name or Applicant / ID Number</label>
+                <div class="input-with-button">
+                  <input type="text" id="home-quick-id" placeholder="e.g. Rajesh, Kumar, 0001, or MVSR-2026-0001" value="MVSR-2026-0001" onkeydown="if(event.key==='Enter'){event.preventDefault(); app.quickLookup();}">
+                  <button class="btn btn-cyan btn-sm" onclick="app.quickLookup()">
+                    <span>Inspect</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </button>
+                </div>
+                <div class="lookup-chips">
+                  <span class="chip-label">Quick Search Samples:</span>
+                  <button class="chip" onclick="app.viewPatientDetail('MVSR-2026-0001')">Applicant #1 (Rajesh Kumar)</button>
+                  <button class="chip" onclick="app.viewPatientDetail('MVSR-2026-0002')">Applicant #2 (Ananya Sharma)</button>
+                  <button class="chip" onclick="app.viewPatientDetail('MVSR-2026-0004')">Applicant #4 (Sneha Reddy)</button>
+                </div>
+              </div>
+
+              <!-- Quick Health Facility Stats -->
+              <div class="stats-mini-grid">
+                <div class="mini-stat">
+                  <div class="stat-number" id="stat-total-patients">0</div>
+                  <div class="stat-label">Total Indexed</div>
+                </div>
+                <div class="mini-stat">
+                  <div class="stat-number" id="stat-total-visits">0</div>
+                  <div class="stat-label">Revisits Logged</div>
+                </div>
+                <div class="mini-stat">
+                  <div class="stat-number text-emerald">100%</div>
+                  <div class="stat-label">Cashless Rate</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Facility Highlights Badge -->
+            <div class="glass-card faculty-duty-card">
+              <div class="faculty-badge-row">
+                <div class="live-dot-green"></div>
+                <span class="duty-text"><strong>4 Specialized Departments</strong> Open for Consultations Today</span>
+              </div>
+              <div class="duty-tags">
+                <span class="dept-tag cardiology">Cardiology</span>
+                <span class="dept-tag neurology">Neurology</span>
+                <span class="dept-tag orthopedics">Orthopedics</span>
+                <span class="dept-tag pediatrics">Pediatrics</span>
+                <span class="dept-tag general">General Medicine</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Capabilities Section -->
+      <div class="container features-section">
+        <div class="section-heading text-center">
+          <span class="sub-badge">DESIGNED FOR CLINICAL EXCELLENCE</span>
+          <h2 class="section-title">Engineered to Solve Key Healthcare Challenges</h2>
+          <p class="section-subtitle">Structured, understandable, traceable, and effortless for medical faculty to review historical consultations.</p>
+        </div>
+
+        <div class="features-grid">
+          <!-- Feature 1 -->
+          <div class="feature-card interactive-hover">
+            <div class="feature-icon bg-cyan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            </div>
+            <h3>Traceable Revisit History</h3>
+            <p>Every subsequent visit links automatically to the patient's master record. Doctors can track blood pressure trends, recurring symptoms, and medication adjustments across months or years.</p>
+            <div class="feature-highlight">
+              <span class="bullet">✓</span> Never lose past diagnosis notes or lab findings
+            </div>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="feature-card interactive-hover">
+            <div class="feature-icon bg-indigo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h10"/></svg>
+            </div>
+            <h3>Unique Incrementing ID</h3>
+            <p>Strict sequential alphanumeric indexing (<code>MVSR-2026-0001</code>). Eliminates duplicate files, spelling discrepancies, and enables instantaneous cross-department lookup in under 1 second.</p>
+            <div class="feature-highlight">
+              <span class="bullet">✓</span> Automated sequential numbering on 1st visit
+            </div>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="feature-card interactive-hover">
+            <div class="feature-icon bg-emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/><path d="m16 15 2 2 4-4"/></svg>
+            </div>
+            <h3>100% Cashless Fee Settlement</h3>
+            <p>Healthcare staff no longer have to manage physical cash drawers, change calculation, or manual receipt books. Instant UPI QR scan, card swipe, or digital invoice generation for every consultation.</p>
+            <div class="feature-highlight">
+              <span class="bullet">✓</span> Real-time settlement with official downloadable receipts
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 2: PATIENT DIRECTORY & INDEX PAGE                   -->
+    <!-- ======================================================== -->
+    <section id="view-directory" class="app-view">
+      <div class="container view-container">
+        <!-- Directory Header -->
+        <div class="view-header-bar">
+          <div>
+            <div class="breadcrumb-trail">
+              <span>MVSR Healthcare</span> / <span>Patient Master Records</span>
+            </div>
+            <h2 class="view-title">Patient Index & Medical Registry</h2>
+            <p class="view-subtitle">Chronological directory of all registered patients with unique identification, visit frequencies, and treatment tracking.</p>
+          </div>
+          <div class="header-tools">
+            <button class="btn btn-secondary btn-sm" onclick="app.exportPatientsJSON()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              <span>Export Ledger</span>
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="app.navigate('register')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12"/></svg>
+              <span>Register 1st Time Patient</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Search Control Panel -->
+        <div class="glass-card directory-control-panel">
+          <div class="search-filter-row">
+            <div class="search-box-large">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" id="dir-search-input" placeholder="Search by Patient Name, Applicant No (e.g. 1, 0001, MVSR-2026-0001), Phone, or Reason..." oninput="app.filterPatients()">
+              <button class="clear-btn hidden" id="dir-clear-btn" onclick="app.clearDirSearch()">✕</button>
+            </div>
+            
+            <div class="filter-group">
+              <select id="dir-filter-dept" class="custom-select" onchange="app.filterPatients()">
+                <option value="all">All Departments</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="General Medicine">General Medicine</option>
+                <option value="Dermatology">Dermatology</option>
+              </select>
+
+              <select id="dir-filter-status" class="custom-select" onchange="app.filterPatients()">
+                <option value="all">All Fee Statuses</option>
+                <option value="paid">Fee Cleared (Paid)</option>
+                <option value="pending">Pending Payment</option>
+              </select>
+
+              <div class="view-toggle-btns">
+                <button class="toggle-btn active" id="btn-view-table" onclick="app.setDirectoryLayout('table')" title="Table View">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
+                </button>
+                <button class="toggle-btn" id="btn-view-grid" onclick="app.setDirectoryLayout('grid')" title="Card Grid View">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Stat Chips Row -->
+          <div class="dir-summary-bar">
+            <div class="stat-pill">Showing <strong id="dir-count-matched">0</strong> of <span id="dir-count-total">0</span> Patients</div>
+            <div class="stat-pill-group">
+              <span class="dot-indicator green"></span> <span id="dir-count-cleared">0</span> Fee Settled
+              <span class="dot-indicator amber" style="margin-left: 12px;"></span> <span id="dir-count-dues">0</span> Pending Dues
+            </div>
+          </div>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- FEATURE: REVIEW FOR USERS EXPERIENCE (VISIT QUALITY)     -->
+        <!-- ======================================================== -->
+        <div class="experience-review-section glass-card">
+          <div class="review-section-header">
+            <div class="review-badge-title">
+              <div class="review-icon-box">⭐</div>
+              <div>
+                <h3 style="font-size: 19px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                  <span>Review for Users Experience</span>
+                  <span class="nav-highlight-pill" style="font-size: 10px;">Visit Quality</span>
+                </h3>
+                <p style="font-size: 12.5px; color: var(--text-muted);">
+                  Evaluating visits quality across faculty consultations to continuously advance our clinical standards from great to amazing.
+                </p>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div class="review-score-hero">
+                <span class="review-score-num" id="avg-review-score">4.9</span>
+                <span class="review-score-max">/ 5.0</span>
+                <div class="star-rating-display">★★★★★</div>
+              </div>
+              <button class="btn btn-emerald btn-sm" onclick="app.openReviewModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>+ Share Visit Experience Review</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Rating Breakdown Pills -->
+          <div class="review-metrics-pills">
+            <div class="review-pill">
+              <span>🩺 Doctor Consultation Quality:</span>
+              <strong id="metric-consult-rating">4.9 ★</strong>
+            </div>
+            <div class="review-pill">
+              <span>⏱️ Waiting Time & Queue Ease:</span>
+              <strong id="metric-wait-rating">4.8 ★</strong>
+            </div>
+            <div class="review-pill">
+              <span>🏥 Facility Cleanliness & Hygiene:</span>
+              <strong id="metric-clean-rating">5.0 ★</strong>
+            </div>
+            <div class="review-pill">
+              <span>💳 Cashless Fee Settlement Ease:</span>
+              <strong id="metric-pay-rating">4.9 ★</strong>
+            </div>
+          </div>
+
+          <!-- Dynamic User Experience Feed Carousel / Cards -->
+          <div class="review-cards-carousel" id="experience-reviews-feed">
+            <!-- Dynamically loaded by app.renderExperienceReviews() -->
+          </div>
+        </div>
+
+        <!-- Dynamic Patient Table Container -->
+        <div id="directory-table-container" class="glass-card directory-table-card">
+          <div class="table-responsive">
+            <table class="mvsr-table" id="patients-table">
+              <thead>
+                <tr>
+                  <th>Unique ID / Applicant No</th>
+                  <th>Patient Name & Demographics</th>
+                  <th>Contact Info</th>
+                  <th>Blood Group</th>
+                  <th>Total Visits</th>
+                  <th>Latest Visit Reason & Date</th>
+                  <th>Fee Status</th>
+                  <th class="text-right">QUICK ACTION IMPLEMENTATION FOR PATIENT</th>
+                </tr>
+              </thead>
+              <tbody id="patients-table-body">
+                <!-- Dynamically populated by app.renderPatientsTable() -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Dynamic Patient Grid Container (Alternative View) -->
+        <div id="directory-grid-container" class="patient-card-grid hidden">
+          <!-- Dynamically populated by app.renderPatientsGrid() -->
+        </div>
+
+        <!-- No Results Fallback -->
+        <div id="directory-empty-state" class="empty-state glass-card hidden">
+          <div class="empty-icon">🔍</div>
+          <h3>No Patient Records Match Your Search</h3>
+          <p>Try searching for a different name, unique ID, or reset the department and status filters.</p>
+          <button class="btn btn-secondary btn-sm" onclick="app.resetDirFilters()">Reset All Filters</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 3: PATIENT DEEP-DIVE & REVISIT TIMELINE             -->
+    <!-- ======================================================== -->
+    <section id="view-patient-detail" class="app-view">
+      <div class="container view-container">
+        <!-- Detail Header -->
+        <div class="view-header-bar">
+          <div>
+            <div class="breadcrumb-trail">
+              <a href="javascript:void(0)" onclick="app.navigate('directory')">Patient Index</a> / <span id="detail-breadcrumb-id">MVSR-2026-0001</span>
+            </div>
+            <h2 class="view-title">Patient Medical Dossier & Revisit History</h2>
+            <p class="view-subtitle">Comprehensive longitudinal health record for healthcare faculty review and consultation logging.</p>
+          </div>
+          <div class="header-tools">
+            <button class="btn btn-secondary btn-sm" onclick="app.printPatientDossier()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+              <span>Print Medical File</span>
+            </button>
+            <button class="btn btn-emerald btn-sm" id="detail-log-visit-btn" onclick="app.openLogVisitModal()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              <span>Log New Revisit Consultation</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Top Profile Banner Card -->
+        <div class="patient-master-card glass-card">
+          <div class="master-card-inner">
+            <div class="patient-avatar-box">
+              <div class="avatar-large" id="detail-avatar">RK</div>
+              <div class="badge-unique-id" id="detail-patient-id">MVSR-2026-0001</div>
+              <div class="applicant-badge-pill" id="detail-applicant-no">Applicant #0001</div>
+            </div>
+
+            <div class="patient-core-info">
+              <div class="name-status-row">
+                <h1 class="patient-full-name" id="detail-full-name">Rajesh Kumar</h1>
+                <span class="status-badge" id="detail-payment-pill">Fee Cleared</span>
+                <span class="blood-group-badge" id="detail-blood-group">O+</span>
+              </div>
+              
+              <div class="demographics-grid">
+                <div class="demo-item">
+                  <span class="demo-label">Age & Gender</span>
+                  <span class="demo-value" id="detail-age-gender">54 Yrs • Male</span>
+                </div>
+                <div class="demo-item">
+                  <span class="demo-label">Phone Number</span>
+                  <span class="demo-value" id="detail-phone">+91 98490 12345</span>
+                </div>
+                <div class="demo-item">
+                  <span class="demo-label">Emergency Contact</span>
+                  <span class="demo-value" id="detail-emergency">Suresh Kumar (Son)</span>
+                </div>
+                <div class="demo-item">
+                  <span class="demo-label">Registered Since</span>
+                  <span class="demo-value" id="detail-registered-date">15 Jan 2026</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Visits Counter Widget -->
+            <div class="visit-frequency-widget">
+              <div class="frequency-number" id="detail-visit-count">4</div>
+              <div class="frequency-label">Total Documented Visits</div>
+              <div class="frequency-meta">First visit: <span id="detail-first-visit-date">15 Jan 2026</span></div>
+              <div class="widget-action">
+                <button class="btn btn-cyan btn-xs" onclick="app.openLogVisitModal()">+ Add Consultation</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Baseline Medical Alerts Strip -->
+          <div class="medical-alerts-strip">
+            <div class="alert-item">
+              <span class="alert-title">Known Allergies:</span>
+              <span class="alert-desc" id="detail-allergies">Penicillin, Sulfa drugs</span>
+            </div>
+            <div class="alert-item">
+              <span class="alert-title">Chronic Conditions:</span>
+              <span class="alert-desc" id="detail-chronic">Hypertension (Grade 2), Mild Hyperlipidemia</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revisit History Timeline Section -->
+        <div class="timeline-section-container">
+          <div class="timeline-header">
+            <div class="timeline-title-row">
+              <div class="icon-tree">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="2" x2="12" y2="22"/><polyline points="19 12 12 19 5 12"/></svg>
+              </div>
+              <div>
+                <h3 class="timeline-main-title">Chronological Consultation & Revisit History</h3>
+                <p class="timeline-sub">Review patient progress, past clinical diagnoses, vital signs, and prescribed treatments.</p>
+              </div>
+            </div>
+            <div class="timeline-quick-legend">
+              <span class="legend-item"><span class="legend-dot first"></span> Initial Consultation</span>
+              <span class="legend-item"><span class="legend-dot revisit"></span> Follow-up Revisit</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Timeline Container -->
+          <div class="timeline-track" id="patient-timeline-track">
+            <!-- Dynamically populated with visit cards -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 4: FIRST-TIME PATIENT REGISTRATION                  -->
+    <!-- ======================================================== -->
+    <section id="view-register" class="app-view">
+      <div class="container view-container">
+        <div class="view-header-bar text-center max-w-700">
+          <div class="registration-sparkle">🏥 FIRST VISIT ONBOARDING</div>
+          <h2 class="view-title">New Patient Intake & Unique ID Generation</h2>
+          <p class="view-subtitle">Register patients visiting MVSR Healthcare Facility for the first time. The system will automatically allocate the next unique tracking sequence number.</p>
+        </div>
+
+        <div class="registration-layout">
+          <!-- Left: Registration Form -->
+          <div class="glass-card form-card">
+            <form id="new-patient-form" onsubmit="app.handlePatientRegistration(event)">
+              <!-- Section 1: Demographics -->
+              <div class="form-section-title">
+                <span class="step-num">1</span>
+                <span>Personal & Demographic Profile</span>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-field col-span-2">
+                  <label for="reg-fullname">Full Legal Name <span class="required">*</span></label>
+                  <input type="text" id="reg-fullname" placeholder="e.g. Priyadarshini Rao" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="reg-age">Age (Years) <span class="required">*</span></label>
+                  <input type="number" id="reg-age" min="1" max="120" placeholder="e.g. 32" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="reg-gender">Gender <span class="required">*</span></label>
+                  <select id="reg-gender" class="custom-select" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="Female">Female</option>
+                    <option value="Male">Male</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="reg-phone">Contact Phone Number <span class="required">*</span></label>
+                  <input type="tel" id="reg-phone" placeholder="e.g. +91 98765 43210" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="reg-blood">Blood Group <span class="required">*</span></label>
+                  <select id="reg-blood" class="custom-select" required>
+                    <option value="" disabled selected>Select Blood Type</option>
+                    <option value="O+">O Positive (O+)</option>
+                    <option value="O-">O Negative (O-)</option>
+                    <option value="A+">A Positive (A+)</option>
+                    <option value="A-">A Negative (A-)</option>
+                    <option value="B+">B Positive (B+)</option>
+                    <option value="B-">B Negative (B-)</option>
+                    <option value="AB+">AB Positive (AB+)</option>
+                    <option value="AB-">AB Negative (AB-)</option>
+                  </select>
+                </div>
+
+                <div class="form-field col-span-2">
+                  <label for="reg-emergency">Emergency Contact (Name & Relationship)</label>
+                  <input type="text" id="reg-emergency" placeholder="e.g. Ramesh Rao (Spouse) - 98480 11223">
+                </div>
+              </div>
+
+              <!-- Section 2: Clinical Baseline -->
+              <div class="form-section-title mt-6">
+                <span class="step-num">2</span>
+                <span>Clinical Baseline & Initial Consultation</span>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-field">
+                  <label for="reg-dept">Attending Department <span class="required">*</span></label>
+                  <select id="reg-dept" class="custom-select" required>
+                    <option value="General Medicine" selected>General Medicine</option>
+                    <option value="Cardiology">Cardiology</option>
+                    <option value="Neurology">Neurology</option>
+                    <option value="Orthopedics">Orthopedics</option>
+                    <option value="Pediatrics">Pediatrics</option>
+                    <option value="Dermatology">Dermatology</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="reg-doctor">Attending Doctor <span class="required">*</span></label>
+                  <select id="reg-doctor" class="custom-select" required>
+                    <option value="Dr. V. Prasad (MD, Gen Med)" selected>Dr. V. Prasad (MD, Gen Med)</option>
+                    <option value="Dr. Radhika Sen (MD, DM Cardiology)">Dr. Radhika Sen (Cardiology)</option>
+                    <option value="Dr. K. Raghavan (MS Ortho)">Dr. K. Raghavan (Orthopedics)</option>
+                    <option value="Dr. Sunita Murthy (MD Ped)">Dr. Sunita Murthy (Pediatrics)</option>
+                    <option value="Dr. Arvind Deshmukh (MD Neuro)">Dr. Arvind Deshmukh (Neurology)</option>
+                  </select>
+                </div>
+
+                <div class="form-field col-span-2">
+                  <label for="reg-reason">Chief Complaint / Reason for First Visit <span class="required">*</span></label>
+                  <textarea id="reg-reason" rows="2" placeholder="e.g. Acute migraine with visual aura for 3 days, accompanied by nausea." required></textarea>
+                </div>
+
+                <div class="form-field">
+                  <label for="reg-allergies">Known Drug / Food Allergies</label>
+                  <input type="text" id="reg-allergies" placeholder="e.g. None or Aspirin, Dust">
+                </div>
+
+                <div class="form-field">
+                  <label for="reg-chronic">Pre-Existing Conditions</label>
+                  <input type="text" id="reg-chronic" placeholder="e.g. Type 2 Diabetes, Asthma">
+                </div>
+
+                <div class="form-field">
+                  <label for="reg-fee">Initial Consultation Fee (₹) <span class="required">*</span></label>
+                  <input type="number" id="reg-fee" value="500" min="0" step="50" required>
+                </div>
+
+                <div class="form-field">
+                  <label for="reg-pay-now">Collect Fee via Cashless Mode Now?</label>
+                  <select id="reg-pay-now" class="custom-select">
+                    <option value="pay_now">Yes - Proceed to Cashless Pay Now</option>
+                    <option value="pay_later">Generate Pending Invoice (Pay Later)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-actions mt-6">
+                <button type="button" class="btn btn-secondary" onclick="app.navigate('directory')">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-glow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                  <span>Generate Record & Issue Card</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right: Live ID Card Preview -->
+          <div class="id-card-preview-container">
+            <div class="preview-title">Digital Health Card Preview</div>
+            
+            <div class="digital-health-card" id="preview-health-card">
+              <div class="card-chip-hologram"></div>
+              <div class="card-top-row">
+                <div class="card-hospital-logo">
+                  <span class="mvsr-mark">MVSR</span>
+                  <span class="mvsr-sub">HEALTHCARE</span>
+                </div>
+                <div class="card-qr-box" title="Unique Medical QR Code">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><rect width="8" height="8" x="2" y="2"/><rect width="8" height="8" x="14" y="2"/><rect width="8" height="8" x="2" y="14"/><rect width="4" height="4" x="14" y="14"/><rect width="4" height="4" x="18" y="18"/></svg>
+                </div>
+              </div>
+
+              <div class="card-patient-id" id="preview-assigned-id">MVSR-2026-0007</div>
+              <div class="card-patient-name" id="preview-card-name">Priyadarshini Rao</div>
+
+              <div class="card-details-row">
+                <div>
+                  <span class="card-label">BLOOD TYPE</span>
+                  <span class="card-val" id="preview-card-blood">O+</span>
+                </div>
+                <div>
+                  <span class="card-label">AGE / GENDER</span>
+                  <span class="card-val" id="preview-card-demog">32 Y / F</span>
+                </div>
+                <div>
+                  <span class="card-label">ISSUED</span>
+                  <span class="card-val" id="preview-card-date">TODAY</span>
+                </div>
+              </div>
+
+              <div class="card-footer-strip">
+                <span>Official Hospital Identification Badge • Keep Handy for Revisits</span>
+              </div>
+            </div>
+
+            <!-- Guarantee Notice -->
+            <div class="glass-card guarantee-card">
+              <div class="guarantee-icon">🛡️</div>
+              <div>
+                <strong>Automatic Revisit Indexing</strong>
+                <p>Once registered, this patient never needs a new card. Every subsequent visit links securely to this unique ID number.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 5: ONLINE CASHLESS FEE PAYMENT PORTAL               -->
+    <!-- ======================================================== -->
+    <section id="view-payments" class="app-view">
+      <div class="container view-container">
+        <div class="view-header-bar">
+          <div>
+            <div class="breadcrumb-trail">
+              <span>MVSR Healthcare</span> / <span>Cashless Digital Billing</span>
+            </div>
+            <h2 class="view-title">Cashless Fee Settlement Portal</h2>
+            <p class="view-subtitle">Zero-cash workflow for medical faculty. Collect consultation fees, lab charges, and issue instant receipts digitally.</p>
+          </div>
+          <div class="header-tools">
+            <div class="cashless-badge-pill">
+              <span class="pulse-dot-green"></span>
+              <span>100% Cashless Medical Campus</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Overview Dashboard -->
+        <div class="finance-metrics-grid">
+          <div class="finance-card glass-card">
+            <div class="metric-icon-bg emerald">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="metric-info">
+              <div class="metric-val" id="fin-total-collected">₹14,500</div>
+              <div class="metric-label">Digital Collections (Today)</div>
+            </div>
+          </div>
+
+          <div class="finance-card glass-card">
+            <div class="metric-icon-bg amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="metric-info">
+              <div class="metric-val text-amber" id="fin-pending-dues">₹2,050</div>
+              <div class="metric-label">Outstanding Invoices</div>
+            </div>
+          </div>
+
+          <div class="finance-card glass-card">
+            <div class="metric-icon-bg cyan">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            </div>
+            <div class="metric-info">
+              <div class="metric-val" id="fin-cleared-count">18</div>
+              <div class="metric-label">Digital Invoices Settled</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Patient Billing Invoices -->
+        <div class="glass-card mt-6">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Patient Fee Registry & Invoices</h3>
+              <p class="card-sub">Select any patient with pending or historical treatment fees to clear dues via UPI, Card, or Net Banking.</p>
+            </div>
+            <div class="table-search-inline">
+              <input type="text" id="payment-search" placeholder="Search bill by Patient ID / Name..." oninput="app.renderPaymentTable()">
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="mvsr-table" id="payments-ledger-table">
+              <thead>
+                <tr>
+                  <th>Invoice ID</th>
+                  <th>Patient Info</th>
+                  <th>Visit Department</th>
+                  <th>Treatment Date</th>
+                  <th>Fee Breakdown</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th class="text-right">Settlement Action</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 1: FACULTY REVISIT CONSULTATION LOGGER             -->
+  <!-- ======================================================== -->
+  <div id="modal-log-revisit" class="modal-backdrop hidden" onclick="app.closeModalOnBackdrop(event, 'modal-log-revisit')">
+    <div class="modal-content glass-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="badge-icon-cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Log Patient Revisit Consultation</h3>
+            <p class="modal-sub">Attending Faculty: <strong id="revisit-modal-patient-header">Patient Name (ID)</strong></p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-log-revisit')">✕</button>
+      </div>
+
+      <form id="revisit-form" onsubmit="app.handleRevisitSubmit(event)">
+        <div class="modal-body">
+          <input type="hidden" id="revisit-patient-id">
+
+          <!-- Patient Quick Bar -->
+          <div class="revisit-quick-summary">
+            <div><span class="label">Patient:</span> <strong id="revisit-summary-name">-</strong></div>
+            <div><span class="label">Total Prior Visits:</span> <strong id="revisit-summary-count">0</strong></div>
+            <div><span class="label">Blood Group:</span> <strong id="revisit-summary-blood">-</strong></div>
+            <div><span class="label">Previous Reason:</span> <span id="revisit-summary-last-reason">-</span></div>
+          </div>
+
+          <!-- Section 1: Clinical Vitals Log -->
+          <div class="form-section-title mt-4">
+            <span>🩺 Current Vital Signs</span>
+          </div>
+          <div class="vitals-input-grid">
+            <div class="form-field">
+              <label for="revisit-bp">Blood Pressure (mmHg)</label>
+              <input type="text" id="revisit-bp" placeholder="e.g. 120/80" required>
+            </div>
+            <div class="form-field">
+              <label for="revisit-hr">Heart Rate (BPM)</label>
+              <input type="number" id="revisit-hr" placeholder="e.g. 76" required>
+            </div>
+            <div class="form-field">
+              <label for="revisit-spo2">SpO2 Level (%)</label>
+              <input type="number" id="revisit-spo2" placeholder="e.g. 98" required>
+            </div>
+            <div class="form-field">
+              <label for="revisit-temp">Temperature (°F)</label>
+              <input type="text" id="revisit-temp" placeholder="e.g. 98.4" required>
+            </div>
+            <div class="form-field">
+              <label for="revisit-weight">Weight (kg)</label>
+              <input type="number" id="revisit-weight" placeholder="e.g. 68" step="0.5">
+            </div>
+          </div>
+
+          <!-- Section 2: Revisit Assessment -->
+          <div class="form-section-title mt-4">
+            <span>📋 Clinical Assessment & Attending Doctor Notes</span>
+          </div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="revisit-dept">Department <span class="required">*</span></label>
+              <select id="revisit-dept" class="custom-select" required>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="General Medicine" selected>General Medicine</option>
+                <option value="Dermatology">Dermatology</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="revisit-doctor">Attending Faculty Member <span class="required">*</span></label>
+              <input type="text" id="revisit-doctor" value="Dr. V. Prasad (MD)" required>
+            </div>
+
+            <div class="form-field col-span-2">
+              <label for="revisit-reason">Reason for Revisit / Current Symptoms <span class="required">*</span></label>
+              <input type="text" id="revisit-reason" placeholder="e.g. Follow-up for BP control and review of medication tolerance" required>
+            </div>
+
+            <div class="form-field col-span-2">
+              <label for="revisit-diagnosis">Clinical Diagnosis / Progress Assessment <span class="required">*</span></label>
+              <input type="text" id="revisit-diagnosis" placeholder="e.g. Essential Hypertension well-controlled on current ACE-inhibitor" required>
+            </div>
+
+            <div class="form-field col-span-2">
+              <label for="revisit-prescriptions">Prescriptions & Dosages (Format: Medicine - Dose - Frequency - Duration)</label>
+              <textarea id="revisit-prescriptions" rows="2" placeholder="e.g. Tab. Telmisartan 40mg - 1-0-0 - 30 days&#10;Tab. Atorvastatin 10mg - 0-0-1 - 30 days"></textarea>
+            </div>
+
+            <div class="form-field col-span-2">
+              <label for="revisit-notes">Doctor Advice & Recommendations</label>
+              <textarea id="revisit-notes" rows="2" placeholder="e.g. Maintain low sodium diet. Daily 30 min brisk walk. Follow-up after 4 weeks."></textarea>
+            </div>
+
+            <div class="form-field">
+              <label for="revisit-fee">Revisit Consultation Fee (₹) <span class="required">*</span></label>
+              <input type="number" id="revisit-fee" value="400" min="0" step="50" required>
+            </div>
+
+            <div class="form-field">
+              <label for="revisit-payment-mode">Fee Settlement Workflow</label>
+              <select id="revisit-payment-mode" class="custom-select">
+                <option value="open_pay_modal">Save & Open Cashless Payment Now</option>
+                <option value="pending">Add to Pending Invoices (Cashless Later)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-log-revisit')">Cancel</button>
+          <button type="submit" class="btn btn-emerald btn-glow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Record Revisit in File</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 2: INTERACTIVE CASHLESS PAYMENT GATEWAY            -->
+  <!-- ======================================================== -->
+  <div id="modal-payment-gateway" class="modal-backdrop hidden" onclick="app.closeModalOnBackdrop(event, 'modal-payment-gateway')">
+    <div class="modal-content glass-card modal-payment">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="badge-icon-emerald">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Cashless Fee Settlement</h3>
+            <p class="modal-sub">Direct digital clearance for MVSR Healthcare</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-payment-gateway')">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Bill Overview Header -->
+        <div class="bill-summary-banner">
+          <div class="bill-patient-meta">
+            <span class="badge-unique-id" id="pay-modal-patient-id">MVSR-2026-0001</span>
+            <span class="bill-patient-name" id="pay-modal-patient-name">Rajesh Kumar</span>
+            <span class="bill-visit-desc" id="pay-modal-reason">Follow-up Consultation</span>
+          </div>
+          <div class="bill-amount-meta">
+            <span class="bill-amt-label">TOTAL TO PAY</span>
+            <span class="bill-amt-number" id="pay-modal-amount">₹400</span>
+          </div>
+        </div>
+
+        <!-- Payment Method Tabs -->
+        <div class="payment-tabs-bar">
+          <button class="pay-tab active" data-tab="upi" onclick="app.switchPayTab('upi')">
+            <span class="tab-icon">⚡</span>
+            <span>UPI / Instant QR</span>
+          </button>
+          <button class="pay-tab" data-tab="card" onclick="app.switchPayTab('card')">
+            <span class="tab-icon">💳</span>
+            <span>Debit / Credit Card</span>
+          </button>
+          <button class="pay-tab" data-tab="netbanking" onclick="app.switchPayTab('netbanking')">
+            <span class="tab-icon">🏛️</span>
+            <span>Net Banking</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: UPI QR CODE -->
+        <div id="pay-tab-upi" class="payment-tab-panel active">
+          <div class="upi-box">
+            <div class="qr-code-wrapper">
+              <div class="qr-glow"></div>
+              <!-- Interactive Animated QR Code Simulation -->
+              <div class="qr-image-container">
+                <svg class="qr-matrix" viewBox="0 0 100 100">
+                  <rect x="5" y="5" width="25" height="25" fill="#0EA5E9" rx="3"/>
+                  <rect x="10" y="10" width="15" height="15" fill="#0B1120"/>
+                  <rect x="13" y="13" width="9" height="9" fill="#0EA5E9"/>
+                  
+                  <rect x="70" y="5" width="25" height="25" fill="#0EA5E9" rx="3"/>
+                  <rect x="75" y="10" width="15" height="15" fill="#0B1120"/>
+                  <rect x="78" y="13" width="9" height="9" fill="#0EA5E9"/>
+                  
+                  <rect x="5" y="70" width="25" height="25" fill="#0EA5E9" rx="3"/>
+                  <rect x="10" y="75" width="15" height="15" fill="#0B1120"/>
+                  <rect x="13" y="78" width="9" height="9" fill="#0EA5E9"/>
+                  
+                  <circle cx="50" cy="50" r="10" fill="#10B981"/>
+                  <rect x="35" y="15" width="8" height="8" fill="#38BDF8"/>
+                  <rect x="48" y="20" width="12" height="6" fill="#38BDF8"/>
+                  <rect x="40" y="70" width="18" height="8" fill="#38BDF8"/>
+                  <rect x="65" y="65" width="8" height="15" fill="#38BDF8"/>
+                  <rect x="75" y="45" width="14" height="6" fill="#38BDF8"/>
+                </svg>
+                <div class="qr-center-badge">MVSR PAY</div>
+              </div>
+              <div class="qr-scan-line"></div>
+            </div>
+
+            <div class="upi-instructions">
+              <p class="upi-head">Scan with Any UPI App</p>
+              <div class="upi-apps-icons">
+                <span class="app-chip">GPay</span>
+                <span class="app-chip">PhonePe</span>
+                <span class="app-chip">Paytm</span>
+                <span class="app-chip">BHIM</span>
+              </div>
+              <p class="upi-vpa">VPA: <code>mvsrhealthcare@icici</code></p>
+              
+              <button class="btn btn-emerald btn-block mt-4" onclick="app.simulatePaymentSuccess('UPI')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>Approve Instant UPI Payment</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: CREDIT / DEBIT CARD -->
+        <div id="pay-tab-card" class="payment-tab-panel">
+          <div class="card-simulator">
+            <div class="simulated-chip-card">
+              <div class="chip-shine"></div>
+              <div class="chip-card-top">
+                <span>MVSR SMART HEALTHCARE PASS</span>
+                <span class="card-network">VISA</span>
+              </div>
+              <div class="chip-card-number" id="sim-card-num-display">•••• •••• •••• 4242</div>
+              <div class="chip-card-bottom">
+                <div>
+                  <span class="sub-lbl">CARD HOLDER</span>
+                  <span class="val-txt" id="sim-card-name-display">PATIENT NAME</span>
+                </div>
+                <div>
+                  <span class="sub-lbl">EXPIRES</span>
+                  <span class="val-txt">12/28</span>
+                </div>
+              </div>
+            </div>
+
+            <form class="card-input-form mt-4" onsubmit="event.preventDefault(); app.simulatePaymentSuccess('Card')">
+              <div class="form-field">
+                <label>Card Number</label>
+                <input type="text" placeholder="4532 •••• •••• 4242" value="4532 8920 1102 4242" required>
+              </div>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label>Expiry (MM/YY)</label>
+                  <input type="text" placeholder="12/28" value="12/28" required>
+                </div>
+                <div class="form-field">
+                  <label>CVV / CVC</label>
+                  <input type="password" placeholder="888" value="888" maxlength="4" required>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block mt-2">
+                <span>Pay Fee via Card Now</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 3: NET BANKING -->
+        <div id="pay-tab-netbanking" class="payment-tab-panel">
+          <div class="bank-grid">
+            <button class="bank-btn" onclick="app.simulatePaymentSuccess('SBI NetBanking')">State Bank of India</button>
+            <button class="bank-btn" onclick="app.simulatePaymentSuccess('HDFC NetBanking')">HDFC Bank</button>
+            <button class="bank-btn" onclick="app.simulatePaymentSuccess('ICICI NetBanking')">ICICI Bank</button>
+            <button class="bank-btn" onclick="app.simulatePaymentSuccess('Axis NetBanking')">Axis Bank</button>
+          </div>
+          <p class="text-center text-muted mt-3">Direct corporate gateway integration for cashless healthcare clearing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 3: OFFICIAL PRINTABLE RECEIPT / INVOICE            -->
+  <!-- ======================================================== -->
+  <div id="modal-receipt" class="modal-backdrop hidden" onclick="app.closeModalOnBackdrop(event, 'modal-receipt')">
+    <div class="modal-content glass-card modal-receipt">
+      <div class="modal-header">
+        <h3 class="modal-title">Official Digital Payment Receipt</h3>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-receipt')">✕</button>
+      </div>
+      
+      <!-- Stamped Printable Receipt Document -->
+      <div class="official-receipt-sheet" id="receipt-sheet">
+        <div class="receipt-letterhead">
+          <div class="receipt-hosp-info">
+            <div class="receipt-brand-title">MVSR HEALTHCARE FACILITY</div>
+            <div class="receipt-brand-addr">Central Medical & Research Campus, Hyderabad</div>
+            <div class="receipt-brand-contact">Ph: +91 40-2456-7890 • accounts@mvsrhealth.org</div>
+          </div>
+          <div class="receipt-stamp-badge">
+            <div class="stamp-circle">PAID ONLINE</div>
+            <div class="stamp-cashless">ZERO-CASH DESK</div>
+          </div>
+        </div>
+
+        <hr class="receipt-divider">
+
+        <div class="receipt-meta-grid">
+          <div>
+            <span class="meta-lbl">RECEIPT NO:</span>
+            <strong class="meta-val" id="receipt-no">MVSR-REC-90214</strong>
+          </div>
+          <div>
+            <span class="meta-lbl">DATE & TIME:</span>
+            <strong class="meta-val" id="receipt-date">05 Sep 2026, 11:45 AM</strong>
+          </div>
+          <div>
+            <span class="meta-lbl">PATIENT ID:</span>
+            <strong class="meta-val" id="receipt-patient-id">MVSR-2026-0001</strong>
+          </div>
+          <div>
+            <span class="meta-lbl">PATIENT NAME:</span>
+            <strong class="meta-val" id="receipt-patient-name">Rajesh Kumar</strong>
+          </div>
+        </div>
+
+        <table class="receipt-items-table">
+          <thead>
+            <tr>
+              <th>Description / Consultation Service</th>
+              <th>Dept / Faculty</th>
+              <th class="text-right">Amount (INR)</th>
+            </tr>
+          </thead>
+          <tbody id="receipt-items-body">
+            <tr>
+              <td>Medical Consultation & Diagnostic Review</td>
+              <td>Cardiology</td>
+              <td class="text-right">₹400.00</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="2" class="text-right">Total Settled Digitally:</th>
+              <th class="text-right" id="receipt-total-amount">₹400.00</th>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="receipt-footer-notes">
+          <p><strong>Payment Mode:</strong> <span id="receipt-pay-method">UPI (Google Pay)</span> • <strong>Txn Ref:</strong> <span id="receipt-txn-ref">TXN992818290</span></p>
+          <p class="disclaimer">Computer-generated official receipt for MVSR Healthcare Facility. No physical cash exchanged. Valid for insurance reimbursement.</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="app.closeModal('modal-receipt')">Close</button>
+        <button class="btn btn-primary" onclick="window.print()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+          <span>Print / Save as PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 4: REMIND TO PAY FOR PATIENT                       -->
+  <!-- ======================================================== -->
+  <div id="modal-remind-pay" class="modal-backdrop hidden" onclick="app.closeModalOnBackdrop(event, 'modal-remind-pay')">
+    <div class="modal-content glass-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="badge-icon-cyan" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">REMIND TO PAY FOR PATIENT</h3>
+            <p class="modal-sub">Send automated digital reminder with cashless UPI link & invoice details</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-remind-pay')">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="remind-patient-id">
+
+        <!-- Patient Quick Summary Banner -->
+        <div class="bill-summary-banner" style="background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.3);">
+          <div class="bill-patient-meta">
+            <span class="badge-unique-id" id="remind-card-id">MVSR-2026-0002</span>
+            <span class="bill-patient-name" id="remind-card-name">Ananya Sharma</span>
+            <span class="bill-visit-desc" id="remind-card-phone">+91 99887 76655 • ananya.sharma@email.com</span>
+          </div>
+          <div class="bill-amount-meta">
+            <span class="bill-amt-label" style="color: #fde68a;">PENDING TREATMENT DUE</span>
+            <span class="bill-amt-number" id="remind-card-amount" style="color: #fbbf24;">₹850</span>
+          </div>
+        </div>
+
+        <!-- Simulated Reminder Message Preview -->
+        <div class="reminder-preview-box">
+          <div class="reminder-preview-title">📱 Digital Notification Message Preview:</div>
+          <div class="reminder-preview-text" id="remind-preview-content">
+            Dear Ananya Sharma, thank you for visiting MVSR Healthcare Facility (Neurology). A consultation fee of ₹850 is pending. Please clear your dues cashlessly using this secure link: https://mvsr.health/pay/MVSR-2026-0002. No cash counter queue required!
+          </div>
+        </div>
+
+        <!-- Reminder Dispatch Channels -->
+        <div class="form-section-title mt-4">
+          <span>🚀 Instant Dispatch Channels</span>
+        </div>
+
+        <div class="reminder-channels-row">
+          <button class="btn btn-amber btn-sm" onclick="app.sendPaymentReminder('SMS')">
+            <span>📱 Send SMS Alert</span>
+          </button>
+          <button class="btn btn-emerald btn-sm" onclick="app.sendPaymentReminder('WhatsApp')">
+            <span>💬 Send WhatsApp</span>
+          </button>
+          <button class="btn btn-cyan btn-sm" onclick="app.sendPaymentReminder('Email')">
+            <span>📧 Send Email Invoice</span>
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="app.copyPaymentLink()">
+            <span>🔗 Copy UPI Link</span>
+          </button>
+        </div>
+
+        <!-- Quick Options for Account Details & Support Details -->
+        <div style="display: flex; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+          <button class="btn btn-secondary btn-xs" onclick="app.openAccountModalFromRemind()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Edit Account Details (Name, Phone, Email)</span>
+          </button>
+          <button class="btn btn-secondary btn-xs" onclick="app.openSupportModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Hospital Support Details</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-remind-pay')">Close</button>
+        <button type="button" class="btn btn-primary" onclick="app.proceedToPayFromRemind()">
+          <span>Proceed to Pay Cashlessly Now</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 5: ACCOUNT DETAILS (EDIT NAME, EMAIL, PHONE, ETC.) -->
+  <!-- ======================================================== -->
+  <div id="modal-account-details" class="modal-backdrop hidden" onclick="app.closeModalOnBackdrop(event, 'modal-account-details')">
+    <div class="modal-content glass-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="badge-icon-cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">ACCOUNT DETAILS</h3>
+            <p class="modal-sub">Edit personal profile, email, phone number, and emergency information</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-account-details')">✕</button>
+      </div>
+
+      <form id="account-details-form" onsubmit="app.handleAccountSave(event)">
+        <div class="modal-body">
+          <input type="hidden" id="acc-patient-id">
+
+          <div class="form-grid">
+            <div class="form-field col-span-2">
+              <label for="acc-name">Full Legal Name <span class="required">*</span></label>
+              <input type="text" id="acc-name" placeholder="Full legal name" required>
+            </div>
+
+            <div class="form-field">
+              <label for="acc-email">Email Address <span class="required">*</span></label>
+              <input type="email" id="acc-email" placeholder="e.g. patient@example.com" required>
+            </div>
+
+            <div class="form-field">
+              <label for="acc-phone">Contact Phone Number <span class="required">*</span></label>
+              <input type="tel" id="acc-phone" placeholder="+91 98765 43210" required>
+            </div>
+
+            <div class="form-field">
+              <label for="acc-age">Age (Years) <span class="required">*</span></label>
+              <input type="number" id="acc-age" min="1" max="120" required>
+            </div>
+
+            <div class="form-field">
+              <label for="acc-gender">Gender <span class="required">*</span></label>
+              <select id="acc-gender" class="custom-select" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="acc-blood">Blood Group</label>
+              <select id="acc-blood" class="custom-select">
+                <option value="O+">O Positive (O+)</option>
+                <option value="O-">O Negative (O-)</option>
+                <option value="A+">A Positive (A+)</option>
+                <option value="A-">A Negative (A-)</option>
+                <option value="B+">B Positive (B+)</option>
+                <option value="B-">B Negative (B-)</option>
+                <option value="AB+">AB Positive (AB+)</option>
+                <option value="AB-">AB Negative (AB-)</option>
+              </select>
+            </div>
+
+            <div class="form-field col-span-2">
+              <label for="acc-emergency">Emergency Contact (Name, Relationship, Phone)</label>
+              <input type="text" id="acc-emergency" placeholder="e.g. Ramesh (Spouse) - +91 98480 11223">
+            </div>
+
+            <div class="form-field col-span-2">
+              <label for="acc-address">Residential / Mailing Address</label>
+              <input type="text" id="acc-address" placeholder="e.g. Plot 42, Jubilee Hills, Hyderabad">
+            </div>
+
+            <div class="form-field col-span-2">
+              <label for="acc-allergies">Known Medical Allergies</label>
+              <input type="text" id="acc-allergies" placeholder="e.g. Penicillin, Sulfa drugs">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-account-details')">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-glow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Save Account Changes</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 6: SUPPORT DETAILS                                 -->
+  <!-- ======================================================== -->
+  <div id="modal-support-details" class="modal-backdrop hidden" onclick="app.closeModalOnBackdrop(event, 'modal-support-details')">
+    <div class="modal-content glass-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="badge-icon-emerald">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">MVSR HEALTHCARE SUPPORT DETAILS</h3>
+            <p class="modal-sub">24/7 dedicated clinical care assistance & cashless desk coordination</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-support-details')">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="support-grid">
+          <div class="support-channel-card">
+            <div class="support-icon">🚨</div>
+            <div>
+              <div class="support-channel-title">Emergency Trauma Desk</div>
+              <div class="support-channel-desc">24/7 Code Red Ambulance Dispatch & ICU Coordination</div>
+              <a href="tel:+914024567890" class="support-channel-link">+91 40-2456-7890</a>
+            </div>
+          </div>
+
+          <div class="support-channel-card">
+            <div class="support-icon">💬</div>
+            <div>
+              <div class="support-channel-title">WhatsApp Helpdesk</div>
+              <div class="support-channel-desc">Instant appointment inquiries, receipts, & directions</div>
+              <a href="https://wa.me/919440012345" target="_blank" class="support-channel-link">+91 94400 12345</a>
+            </div>
+          </div>
+
+          <div class="support-channel-card">
+            <div class="support-icon">💳</div>
+            <div>
+              <div class="support-channel-title">Cashless Billing Support</div>
+              <div class="support-channel-desc">TPA insurance settlements, payment receipts, refunds</div>
+              <a href="mailto:billing@mvsrhealth.org" class="support-channel-link">billing@mvsrhealth.org</a>
+            </div>
+          </div>
+
+          <div class="support-channel-card">
+            <div class="support-icon">🩺</div>
+            <div>
+              <div class="support-channel-title">Attending Faculty Escalation</div>
+              <div class="support-channel-desc">Senior Physician consult feedback & medical records</div>
+              <a href="mailto:faculty.care@mvsrhealth.org" class="support-channel-link">faculty.care@mvsrhealth.org</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Quick Inquiry Simulator -->
+        <div class="glass-card" style="background: rgba(14, 165, 233, 0.05); border-color: rgba(14, 165, 233, 0.2); padding: 18px;">
+          <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">Direct Support Inquiry Request</h4>
+          <div class="form-grid">
+            <div class="form-field col-span-2">
+              <input type="text" id="support-inquiry-text" placeholder="Describe your question or assistance needed (e.g. receipt duplicate, doctor timing)...">
+            </div>
+          </div>
+          <button class="btn btn-cyan btn-sm mt-3" onclick="app.submitSupportInquiry()">
+            <span>Submit Support Request</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="app.closeModal('modal-support-details')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 7: REVIEW FOR USERS EXPERIENCE (VISIT QUALITY)     -->
+  <!-- ======================================================== -->
+  <div id="modal-experience-review" class="modal-backdrop hidden" onclick="app.closeModalOnBackdrop(event, 'modal-experience-review')">
+    <div class="modal-content glass-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="badge-icon-cyan" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">REVIEW FOR USERS EXPERIENCE</h3>
+            <p class="modal-sub">Evaluate visit quality: What can we improve to be great to amazing?</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="app.closeModal('modal-experience-review')">✕</button>
+      </div>
+
+      <form id="experience-review-form" onsubmit="app.handleReviewSubmit(event)">
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="form-field col-span-2">
+              <label for="rev-patient-select">Select Patient Record <span class="required">*</span></label>
+              <select id="rev-patient-select" class="custom-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <!-- Star Ratings Section -->
+            <div class="form-field">
+              <label>Doctor Consultation & Care Quality</label>
+              <div class="star-rating-interactive" data-rating-field="consult">
+                <span class="star-interactive active" onclick="app.setInteractiveStar('consult', 1)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('consult', 2)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('consult', 3)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('consult', 4)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('consult', 5)">★</span>
+              </div>
+              <input type="hidden" id="star-val-consult" value="5">
+            </div>
+
+            <div class="form-field">
+              <label>Waiting Time & Queue Efficiency</label>
+              <div class="star-rating-interactive" data-rating-field="wait">
+                <span class="star-interactive active" onclick="app.setInteractiveStar('wait', 1)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('wait', 2)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('wait', 3)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('wait', 4)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('wait', 5)">★</span>
+              </div>
+              <input type="hidden" id="star-val-wait" value="5">
+            </div>
+
+            <div class="form-field">
+              <label>Facility Cleanliness & Hygiene</label>
+              <div class="star-rating-interactive" data-rating-field="clean">
+                <span class="star-interactive active" onclick="app.setInteractiveStar('clean', 1)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('clean', 2)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('clean', 3)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('clean', 4)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('clean', 5)">★</span>
+              </div>
+              <input type="hidden" id="star-val-clean" value="5">
+            </div>
+
+            <div class="form-field">
+              <label>Cashless Billing & Clearance Ease</label>
+              <div class="star-rating-interactive" data-rating-field="billing">
+                <span class="star-interactive active" onclick="app.setInteractiveStar('billing', 1)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('billing', 2)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('billing', 3)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('billing', 4)">★</span>
+                <span class="star-interactive active" onclick="app.setInteractiveStar('billing', 5)">★</span>
+              </div>
+              <input type="hidden" id="star-val-billing" value="5">
+            </div>
+
+            <!-- Key Feedback Area: What can we improve to be great to amazing? -->
+            <div class="form-field col-span-2">
+              <label for="rev-improvement" style="font-size: 13px; font-weight: 700; color: #fbbf24;">
+                💡 What can we improve to be great to amazing? <span class="required">*</span>
+              </label>
+              <textarea id="rev-improvement" rows="3" placeholder="Share your suggestions, e.g. digital token display in waiting room, water dispenser near cardiology, even faster prescription dispensing..." required></textarea>
+            </div>
+
+            <div class="form-field col-span-2">
+              <label for="rev-general-comment">General Visit Experience Summary</label>
+              <input type="text" id="rev-general-comment" placeholder="e.g. Dr. Prasad listened patiently, past records were retrieved in seconds without any physical paperwork!">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-experience-review')">Cancel</button>
+          <button type="submit" class="btn btn-emerald btn-glow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Submit Experience Review</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
